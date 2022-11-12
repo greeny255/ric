@@ -31,12 +31,12 @@ std = 0
 # transform = transforms.Compose(
 #     [transforms.ToPILImage(),
 #      transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-
+# transform
 transform = transforms.Compose([transforms.ToPILImage(),
                                 transforms.Resize((300,300)),
                                 transforms.ToTensor(),
                                 transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
-
+# load image from path
 def unpickle(path, size=1000):
     imgs = []
     # valid_images = [".jpg", ".gif", ".png", ".tga"]
@@ -52,6 +52,7 @@ def unpickle(path, size=1000):
         index += 1
     return imgs
 
+# Data Loader
 class Cifar10Dataset(Dataset):
     """Cifar 10 dataset."""
 
@@ -103,6 +104,7 @@ class Cifar10Dataset(Dataset):
 
         return image, self.labels[idx]
 
+# Load data to train
 BATCH_SIZE = 4
 
 dataset = Cifar10Dataset("./hust/", ["food", "indoor", "outdoor"], transform=transform)
@@ -141,6 +143,7 @@ def imshow(img):
     plt.imshow(np.transpose(npimg, (1, 2, 0)))
     plt.show()
 
+# Model Net
 class Net(nn.Module):
     def __init__(self):
         super().__init__()
@@ -161,7 +164,7 @@ class Net(nn.Module):
         x = self.fc3(x)
         return x
 
-
+# Model Network
 # Define a convolution neural network
 class Network(nn.Module):
     def __init__(self):
@@ -194,11 +197,12 @@ class Network(nn.Module):
 
         return output
 
-
+# check device to use GPU or CPU
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 # Assuming that we are on a CUDA machine, this should print a CUDA device:
 print(device)
 
+# Load model
 net = Net()
 # net = Network()
 net.to(device)
@@ -216,7 +220,7 @@ if __name__ == '__main__':
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
-
+    # Train
     for epoch in range(10):
         # loop over the dataset multiple times
         running_loss = 0.0
@@ -245,6 +249,7 @@ if __name__ == '__main__':
     PATH = './classification_model.pth'
     torch.save(net.state_dict(), PATH)
 
+    # Run Test
     dataiter = iter(testloader)
     images, labels = next(dataiter)
 
@@ -252,6 +257,7 @@ if __name__ == '__main__':
     imshow(torchvision.utils.make_grid(images))
     print('GroundTruth: ', ' '.join(f'{classes[labels[j]]:5s}' for j in range(4)))
 
+    # Load model
     net = Net()
     net.load_state_dict(torch.load(PATH))
 
